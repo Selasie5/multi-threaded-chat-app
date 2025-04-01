@@ -16,5 +16,37 @@ public class Main {
         clients.add(clientHandler).start();
       }
     }
+    catch(IOException e){
+      e.printStackTrace();
+    }
+  }
+  static void broadcast(String message, ClientHandler sender){
+  for(ClientHandler client: clients){
+    if(client != sender){
+      client.sendMessage(message);
+    }
+  }
+  }
+  static void removeClient(ClientHandler clientHandler){
+    clients.remove(clientHandler);
+  }
+  }
+  class ClientHandler implements Runnable{
+    private Socket socket;
+    public PrintWriter out;
+    public BufferedReader in;
+    public String username;
+
+    public ClientHandler(Socket socket){
+      this.socket = socket;
+    }
+    public void run  (){
+      try{
+        in  = new BufferedReader((new InputStreamReader(socket.getInputStream())));
+        out  = new PrintWriter(socket.getOutputStream(), true);
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+    }
   }
 }
