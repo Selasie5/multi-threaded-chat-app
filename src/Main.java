@@ -31,7 +31,7 @@ public class Main {
     clients.remove(clientHandler);
   }
   }
-  class ClientHandler implements Runnable{
+  static class ClientHandler implements Runnable{
     private Socket socket;
     public PrintWriter out;
     public BufferedReader in;
@@ -44,9 +44,32 @@ public class Main {
       try{
         in  = new BufferedReader((new InputStreamReader(socket.getInputStream())));
         out  = new PrintWriter(socket.getOutputStream(), true);
+
+        out.println("Enter your name: ");
+        username = in.readLine();
+       ChatServer.broadcast(username + " has joined the chat application", this);
+
+       String message;
+       while((message = in.readLine())!= null){
+         System.out.println(username + " : " + message);
+         ChatServer.broadcast(username + " : " + message, this);
+       }
       } catch (IOException e) {
+        System.out.println(username + "disconnected");
         throw new RuntimeException(e);
       }
+      finally {
+        try {
+          socket.close();
+        }
+        catch (IOException e) {
+          e.printStackTrace();
+        }
+        ChatServer.removeClient(this);
+        }
+      }
+      void sendMessage(String message){
+      out.println(message);
     }
   }
 }
